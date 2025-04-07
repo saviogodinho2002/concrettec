@@ -1,10 +1,9 @@
 <?php
 
 namespace Database\Seeders;
-
-use App\Models\Permission;
-use App\Models\Role;
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class PermissionSeeder extends Seeder
 {
@@ -29,7 +28,7 @@ class PermissionSeeder extends Seeder
         // Criar role master
         $masterRole = Role::updateOrCreate(
             ['name' => 'master'],
-            ['description' => 'Usuário com acesso total ao sistema']
+            ['guard_name' => 'web'],
         );
 
         // Criar permissões para cada modelo
@@ -37,6 +36,8 @@ class PermissionSeeder extends Seeder
             foreach ($this->actions as $action) {
                 $permission = Permission::updateOrCreate(
                     ['name' => "{$model}-{$action}"],
+                    ['guard_name' => 'web'],
+
                 );
 
                 // Atribuir todas as permissões ao role master
@@ -55,6 +56,8 @@ class PermissionSeeder extends Seeder
         foreach ($roles as $name => $description) {
             Role::updateOrCreate(
                 ['name' => $name],
+                ['guard_name' => 'web'],
+
             );
         }
     }
