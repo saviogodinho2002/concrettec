@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\EnterpriseRequest;
+use App\Http\Requests\StoreEnterpriseRequest;
 use App\Models\Enterprise;
 use App\Services\EnterpriseService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\Middleware;
+use Inertia\Inertia;
 
 class EnterpriseController extends Controller
 {
@@ -33,45 +35,60 @@ class EnterpriseController extends Controller
     {
         $user = $request->user();
 
-        if (is_null($user->enterprise_id)) {
+        if ($user->hasRole('master')) {
             $enterprises = $this->enterpriseService->getAll();
         } else {
             $enterprises = collect([$this->enterpriseService->getById($user->enterprise_id)]);
         }
 
-        return view('enterprises.index', compact('enterprises'));
+        return Inertia::render('Enterprises/Index', [
+            'enterprises' => $enterprises
+        ]);
     }
 
     public function create()
     {
-        return view('enterprises.create');
+        return Inertia::render('Enterprises/Form');
     }
 
-    public function store(EnterpriseRequest $request)
+    public function store(StoreEnterpriseRequest $request)
     {
         $this->enterpriseService->create($request->validated());
-        return redirect()->route('enterprises.index')->with('success', 'Empresa criada com sucesso');
+
+        return redirect()
+            ->route('enterprises.index')
+            ->with('success', 'Empresa criada com sucesso');
     }
 
     public function show(Enterprise $enterprise)
     {
-        return view('enterprises.show', compact('enterprise'));
+        return Inertia::render('Enterprises/Show', [
+            'enterprise' => $enterprise
+        ]);
     }
 
     public function edit(Enterprise $enterprise)
     {
-        return view('enterprises.edit', compact('enterprise'));
+        return Inertia::render('Enterprises/Form', [
+            'enterprise' => $enterprise
+        ]);
     }
 
     public function update(EnterpriseRequest $request, Enterprise $enterprise)
     {
         $this->enterpriseService->update($enterprise, $request->validated());
-        return redirect()->route('enterprises.index')->with('success', 'Empresa atualizada com sucesso');
+
+        return redirect()
+            ->route('enterprises.index')
+            ->with('success', 'Empresa atualizada com sucesso');
     }
 
     public function destroy(Enterprise $enterprise)
     {
         $this->enterpriseService->delete($enterprise);
-        return redirect()->route('enterprises.index')->with('success', 'Empresa excluída com sucesso');
+
+        return redirect()
+            ->route('enterprises.index')
+            ->with('success', 'Empresa excluída com sucesso');
     }
 }

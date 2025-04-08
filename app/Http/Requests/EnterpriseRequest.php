@@ -16,11 +16,11 @@ class EnterpriseRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'type' => ['required', Rule::in(['concreteira', 'construtora'])],
+            'type' => ['required', Rule::in(['Concreteira', 'Construtora'])],
             'cnpj' => [
                 'required',
                 'string',
-                'size:14',
+                'size:18',
                 Rule::unique('enterprises')->ignore($this->enterprise),
             ],
         ];
@@ -37,4 +37,4 @@ class EnterpriseRequest extends FormRequest
             'cnpj.unique' => 'Este CNPJ já está cadastrado',
         ];
     }
-} 
+}
