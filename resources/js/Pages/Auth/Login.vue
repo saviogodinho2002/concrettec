@@ -1,20 +1,6 @@
 <script setup>
-import Checkbox from '@/Components/Checkbox.vue';
-import GuestLayout from '@/Layouts/GuestLayout.vue';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
-
-defineProps({
-    canResetPassword: {
-        type: Boolean,
-    },
-    status: {
-        type: String,
-    },
-});
+import { ref } from 'vue';
+import { useForm } from '@inertiajs/vue3';
 
 const form = useForm({
     email: '',
@@ -30,71 +16,53 @@ const submit = () => {
 </script>
 
 <template>
-    <GuestLayout>
-        <Head title="Log in" />
+    <VContainer class="fill-height d-flex align-center justify-center" >
+        <VCard variant="outlined" width="700" elevation="0" style="border-radius: 16px; overflow: hidden;">
+            <VCardText class="pa-6">
+                <VForm @submit.prevent="submit" >
+                    <VTextField
+                        v-model="form.email"
+                        label="Email"
+                        type="email"
+                        required
+                        :error-messages="form.errors.email"
+                        variant="outlined"
+                        dense
+                        class="mb-4"
+                    />
 
-        <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
-            {{ status }}
-        </div>
+                    <VTextField
+                        v-model="form.password"
+                        label="Password"
+                        type="password"
+                        required
+                        :error-messages="form.errors.password"
+                        variant="outlined"
+                        dense
+                        class="mb-4"
+                    />
 
-        <form @submit.prevent="submit">
-            <div>
-                <InputLabel for="email" value="Email" />
+                    
+                    <VCheckbox
+                        v-model="form.remember"
+                        label="Remember me"
+                        class="mb-4"
+                    />
+                </VForm>
+            </VCardText>
 
-                <TextInput
-                    id="email"
-                    type="email"
-                    class="mt-1 block w-full"
-                    v-model="form.email"
-                    required
-                    autofocus
-                    autocomplete="username"
-                />
-
-                <InputError class="mt-2" :message="form.errors.email" />
-            </div>
-
-            <div class="mt-4">
-                <InputLabel for="password" value="Password" />
-
-                <TextInput
-                    id="password"
-                    type="password"
-                    class="mt-1 block w-full"
-                    v-model="form.password"
-                    required
-                    autocomplete="current-password"
-                />
-
-                <InputError class="mt-2" :message="form.errors.password" />
-            </div>
-
-            <div class="mt-4 block">
-                <label class="flex items-center">
-                    <Checkbox name="remember" v-model:checked="form.remember" />
-                    <span class="ms-2 text-sm text-gray-600"
-                        >Remember me</span
-                    >
-                </label>
-            </div>
-
-            <div class="mt-4 flex items-center justify-end">
-                <Link
-                    v-if="canResetPassword"
-                    :href="route('password.request')"
-                    class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                >
-                    Forgot your password?
-                </Link>
-
-                <PrimaryButton
-                    class="ms-4"
-                    :class="{ 'opacity-25': form.processing }"
+            <VCardActions class="d-flex justify-end pa-4">
+                <VBtn
+                    :loading="form.processing"
                     :disabled="form.processing"
+                    color="primary"
+                    @click="submit"
+                    class="elevation-1"
+                    style="border-radius: 8px;"
                 >
                     Log in
-                </PrimaryButton>
-            </div>
-        </form>
-    </GuestLayout>
+                </VBtn>
+            </VCardActions>
+        </VCard>
+    </VContainer>
 </template>

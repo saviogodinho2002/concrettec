@@ -1,198 +1,171 @@
 <script setup>
-import { ref } from 'vue';
-import ApplicationLogo from '@/Components/ApplicationLogo.vue';
-import Dropdown from '@/Components/Dropdown.vue';
-import DropdownLink from '@/Components/DropdownLink.vue';
-import NavLink from '@/Components/NavLink.vue';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
-import { Link } from '@inertiajs/vue3';
+import {computed, onMounted, ref, watch} from 'vue';
+import NavItem from './NavItem/index.vue';
+import ApplicationLogo from "@/Components/ApplicationLogo.vue";
+import {Icon} from "@iconify/vue";
+import {router, usePage} from "@inertiajs/vue3";
+import {menuItem} from "@/Layouts/NavItem/menu-item.js";
 
-const showingNavigationDropdown = ref(false);
+const props = defineProps({
+    title:String,
+})
+
+
+
+const snackbar = ref(false)
+const auth = usePage().props.auth
+const sidebar = ref(true)
+const raill = ref(true)
+const menuItemsByRoles = computed(() => {
+    return menuItem.map(it => {
+        let newItem = { ...it };
+        newItem.to = route(newItem.to);
+        return newItem;
+    });
+});
+
+const snackbarColor = computed(()=>{
+    if(!!usePage().props.flash.success || !!usePage().props.flash.error){
+        return !!usePage().props.flash.success ? 'success' : 'error'
+    }
+    return 'surface'
+})
+
+function resetFlashSnackbar(value){
+    if(!value){
+        usePage().props.flash.success =  null
+        usePage().props.flash.error =  null
+    }
+}
+
+function notification(){
+    if(!!usePage().props.flash.success || !!usePage().props.flash.error){
+        snackbar.value = true
+    }
+}
+
+// watch(
+//     ()=> usePage().props.flash.success ||  usePage().props.flash.error ,
+//     ()=>{
+//         notification()
+//     }
+// )
+
+onMounted(()=>{
+    // notification()
+})
+
+function logout(){
+    router.post(route('logout'))
+}
 </script>
 
 <template>
-    <div>
-        <div class="min-h-screen bg-gray-100">
-            <nav
-                class="border-b border-gray-100 bg-white"
+    <v-card flat>
+        <v-app color="white">
+            <v-navigation-drawer
+                class="!tw-border-none "
+                width="250"
+                
             >
-                <!-- Primary Navigation Menu -->
-                <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div class="flex h-16 justify-between">
-                        <div class="flex">
-                            <!-- Logo -->
-                            <div class="flex shrink-0 items-center">
-                                <Link :href="route('dashboard')">
-                                    <ApplicationLogo
-                                        class="block h-9 w-auto fill-current text-gray-800"
-                                    />
-                                </Link>
-                            </div>
-
-                            <!-- Navigation Links -->
-                            <div
-                                class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex"
-                            >
-                                <NavLink
-                                    :href="route('dashboard')"
-                                    :active="route().current('dashboard')"
-                                >
-                                    Dashboard
-                                </NavLink>
-                            </div>
+                <div class="tw-flex    tw-flex-col tw-justify-between  tw-h-full  ">
+                    <div class="tw-flex tw-flex-col ">
+                        <div class="py-5 tw-my-5 tw-w-full tw-flex tw-items-center tw-justify-center ">
+                            <ApplicationLogo class="tw-max-w-[50px] tw-p-1 bg-primary rounded-lg" />
+                            <span class="tw-text-[25px] tw-font-medium ml-4">Concrettec</span>
                         </div>
+                        <v-divider></v-divider>
+                        <v-list>
+                            <template v-for="(item, i) in menuItemsByRoles">
+                                <NavItem :item="item"  class="leftPadding" />
+                            </template>
+                        </v-list>
+                    </div>
 
-                        <div class="hidden sm:ms-6 sm:flex sm:items-center">
-                            <!-- Settings Dropdown -->
-                            <div class="relative ms-3">
-                                <Dropdown align="right" width="48">
-                                    <template #trigger>
-                                        <span class="inline-flex rounded-md">
-                                            <button
-                                                type="button"
-                                                class="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
-                                            >
-                                                {{ $page.props.auth.user.name }}
+                    <div>
+                        <v-divider></v-divider>
+                        <div class="  tw-px-8 tw-py-4 tw-flex   tw-w-full  tw-cursor-pointer  hover:!tw-bg-white/10 ">
+                          <span class="icon-box py-2 tw-flex tw-items-center">
+                                <Icon @click="logout" icon="solar:logout-2-bold" height="30" width="30"  class=" z-index-2 " />
+                                <span class="tw-ml-8 tw-whitespace-nowrap tw-text-xl"> Sair</span>
+                          </span>
+                        </div>
+                    </div>
 
-                                                <svg
-                                                    class="-me-0.5 ms-2 h-4 w-4"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 20 20"
-                                                    fill="currentColor"
-                                                >
-                                                    <path
-                                                        fill-rule="evenodd"
-                                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                        clip-rule="evenodd"
-                                                    />
-                                                </svg>
-                                            </button>
-                                        </span>
+                </div>
+            </v-navigation-drawer>
+
+            <v-app-bar flat class="px-4">
+                <v-row align="center" no-gutters>
+                    <v-col>
+                        <slot name="header"></slot>
+            
+                    </v-col>
+                    
+                    <v-col cols="auto">
+                        <v-row no-gutters align="center">
+                            <!-- Notificação -->
+                            <v-col class="mr-4">
+                                <v-badge
+                                    color="error"
+                                    content="1"
+                                    offset-x="3"
+                                    offset-y="3"
+                                >
+                                    <v-btn icon variant="text">
+                                        <v-icon>mdi-bell-outline</v-icon>
+                                    </v-btn>
+                                </v-badge>
+                            </v-col>
+
+                            <!-- Perfil -->
+                            <v-col>
+                                <v-menu location="bottom end">
+                                    <template v-slot:activator="{ props }">
+                                        <v-btn
+                                            variant="text"
+                                            v-bind="props"
+                                        >
+                                            <v-avatar size="35" class="mr-2">
+                                                <v-img :src="auth.user.avatar || 'https://randomuser.me/api/portraits/men/85.jpg'"></v-img>
+                                            </v-avatar>
+                                            <span class="mr-2">{{ auth.user.name }}</span>
+                                            <span class="text-grey">{{ auth.user.role || 'Admin' }}</span>
+                                            <v-icon>mdi-chevron-down</v-icon>
+                                        </v-btn>
                                     </template>
 
-                                    <template #content>
-                                        <DropdownLink
-                                            :href="route('profile.edit')"
-                                        >
-                                            Profile
-                                        </DropdownLink>
-                                        <DropdownLink
-                                            :href="route('logout')"
-                                            method="post"
-                                            as="button"
-                                        >
-                                            Log Out
-                                        </DropdownLink>
-                                    </template>
-                                </Dropdown>
+                                    <v-list width="200" elevation="2">
+                                        <v-list-item @click="router.get(route('profile.edit'))">
+                                            <v-list-item-title>Perfil</v-list-item-title>
+                                        </v-list-item>
+                                        <v-list-item @click="logout">
+                                            <v-list-item-title>Sair</v-list-item-title>
+                                        </v-list-item>
+                                    </v-list>
+                                </v-menu>
+                            </v-col>
+                        </v-row>
+                    </v-col>
+                </v-row>
+            </v-app-bar>
+
+            <v-main class="!tw-bg-white">
+                <div class=" hr-layout tw-h-full ">
+                    <v-container fluid class="page-wrapper tw-bg-[#FAFBFC] tw-h-full pt-2 rounded-xl ">
+                        <div class="px-sm-3 pt-3 tw-h-full">
+                            <div class=" maxWidth tw-h-full">
+                                <slot/>
                             </div>
                         </div>
 
-                        <!-- Hamburger -->
-                        <div class="-me-2 flex items-center sm:hidden">
-                            <button
-                                @click="
-                                    showingNavigationDropdown =
-                                        !showingNavigationDropdown
-                                "
-                                class="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none"
-                            >
-                                <svg
-                                    class="h-6 w-6"
-                                    stroke="currentColor"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        :class="{
-                                            hidden: showingNavigationDropdown,
-                                            'inline-flex':
-                                                !showingNavigationDropdown,
-                                        }"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M4 6h16M4 12h16M4 18h16"
-                                    />
-                                    <path
-                                        :class="{
-                                            hidden: !showingNavigationDropdown,
-                                            'inline-flex':
-                                                showingNavigationDropdown,
-                                        }"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M6 18L18 6M6 6l12 12"
-                                    />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
+                    </v-container>
                 </div>
+            </v-main>
+        </v-app>
+    
+       
+    </v-card>
 
-                <!-- Responsive Navigation Menu -->
-                <div
-                    :class="{
-                        block: showingNavigationDropdown,
-                        hidden: !showingNavigationDropdown,
-                    }"
-                    class="sm:hidden"
-                >
-                    <div class="space-y-1 pb-3 pt-2">
-                        <ResponsiveNavLink
-                            :href="route('dashboard')"
-                            :active="route().current('dashboard')"
-                        >
-                            Dashboard
-                        </ResponsiveNavLink>
-                    </div>
-
-                    <!-- Responsive Settings Options -->
-                    <div
-                        class="border-t border-gray-200 pb-1 pt-4"
-                    >
-                        <div class="px-4">
-                            <div
-                                class="text-base font-medium text-gray-800"
-                            >
-                                {{ $page.props.auth.user.name }}
-                            </div>
-                            <div class="text-sm font-medium text-gray-500">
-                                {{ $page.props.auth.user.email }}
-                            </div>
-                        </div>
-
-                        <div class="mt-3 space-y-1">
-                            <ResponsiveNavLink :href="route('profile.edit')">
-                                Profile
-                            </ResponsiveNavLink>
-                            <ResponsiveNavLink
-                                :href="route('logout')"
-                                method="post"
-                                as="button"
-                            >
-                                Log Out
-                            </ResponsiveNavLink>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-
-            <!-- Page Heading -->
-            <header
-                class="bg-white shadow"
-                v-if="$slots.header"
-            >
-                <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                    <slot name="header" />
-                </div>
-            </header>
-
-            <!-- Page Content -->
-            <main>
-                <slot />
-            </main>
-        </div>
-    </div>
 </template>
+
