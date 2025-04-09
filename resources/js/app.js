@@ -12,9 +12,29 @@ import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
 
+// Importação do Toast
+import Toast from "vue-toastification";
+import "vue-toastification/dist/index.css";
+
 import { DEFAULT_THEME } from './Themes/DefaultTheme';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+
+// Opções do Toast
+const toastOptions = {
+    position: "top-right",
+    timeout: 5000,
+    closeOnClick: true,
+    pauseOnFocusLoss: true,
+    pauseOnHover: true,
+    draggable: true,
+    draggablePercent: 0.6,
+    showCloseButtonOnHover: false,
+    hideProgressBar: false,
+    closeButton: "button",
+    icon: true,
+    rtl: false
+};
 
 const vuetify = createVuetify({
     components,
@@ -51,6 +71,7 @@ createInertiaApp({
             .use(plugin)
             .use(vuetify)
             .use(ZiggyVue)
+            .use(Toast, toastOptions)
             .mount(el);
     },
     progress: {

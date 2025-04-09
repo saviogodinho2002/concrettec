@@ -2,22 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ConstructionRequest;
+use App\Http\Requests\StoreConstructionRequest;
+use App\Http\Requests\UpdateConstructionRequest;
 use App\Models\Construction;
-use App\Services\ConstructionService;
+use App\Models\Enterprise;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\Middleware;
+use Inertia\Inertia;
 
 class ConstructionController extends Controller
 {
-    protected $constructionService;
-
-    public function __construct(ConstructionService $constructionService)
-    {
-        $this->constructionService = $constructionService;
-    }
-
-    public static function middleware(): array
+    public static function middleware()
     {
         return [
             'auth',
@@ -31,47 +26,60 @@ class ConstructionController extends Controller
 
     public function index(Request $request)
     {
-        $user = $request->user();
-        
-        if ($user->hasRole('master')) {
-            $constructions = Construction::all();
-        } else {
-            $constructions = $this->constructionService->getByEnterprise($user->enterprise_id);
-        }
-
-        return view('constructions.index', compact('constructions'));
+        return Inertia::render('Constructions/Index', [
+            'constructions' => Construction::with(['enterprise', 'address'])->latest()->paginate(10)
+        ]);
     }
 
     public function create()
     {
-        return view('constructions.create');
+        return Inertia::render('Constructions/Form', [
+            'enterprises' => Enterprise::where('type', 'construcao')->get()
+        ]);
     }
 
-    public function store(ConstructionRequest $request)
+    public function store(StoreConstructionRequest $request)
     {
-        $this->constructionService->create($request->validated());
-        return redirect()->route('constructions.index')->with('success', 'Obra criada com sucesso');
+        $address = \App\Models\Address::create($request->validated()['address']);
+        
+        $construction = Construction::create([
+            ...$request->safe()->except(['address']),
+            'address_id' => $address->id
+        ]);
+
+        return redirect()->route('constructions.index')
+            ->with('success', 'Obra criada com sucesso.');
     }
 
     public function show(Construction $construction)
     {
-        return view('constructions.show', compact('construction'));
+        return Inertia::render('Constructions/Show', [
+            'construction' => $construction->load(['enterprise', 'address'])
+        ]);
     }
 
     public function edit(Construction $construction)
     {
-        return view('constructions.edit', compact('construction'));
+        return Inertia::render('Constructions/Form', [
+            'construction' => $construction->load(['enterprise', 'address']),
+            'enterprises' => Enterprise::where('type', 'construcao')->get()
+        ]);
     }
 
-    public function update(ConstructionRequest $request, Construction $construction)
+    public function update(UpdateConstructionRequest $request, Construction $construction)
     {
-        $this->constructionService->update($construction, $request->validated());
-        return redirect()->route('constructions.index')->with('success', 'Obra atualizada com sucesso');
+        $construction->address->update($request->validated()['address']);
+        $construction->update($request->safe()->except(['address']));
+
+        return redirect()->route('constructions.index')
+            ->with('success', 'Obra atualizada com sucesso.');
     }
 
     public function destroy(Construction $construction)
     {
-        $this->constructionService->delete($construction);
-        return redirect()->route('constructions.index')->with('success', 'Obra excluída com sucesso');
+        $construction->delete();
+
+        return redirect()->route('constructions.index')
+            ->with('success', 'Obra excluída com sucesso.');
     }
 }

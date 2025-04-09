@@ -23,4 +23,12 @@ export const menuItem = [
         permissions: ['enterprise-list'],
         route:'enterprises.*'
     },
+    {
+        title:'Obras',
+        icon: 'solar:buildings-2-bold-duotone',
+        BgColor: 'primary',
+        to: "constructions.index",
+        permissions: ['construction-list'],
+        route:'constructions.*'
+    },
 ]
