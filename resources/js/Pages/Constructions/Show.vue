@@ -53,6 +53,14 @@
                 <span class="tw-text-gray-600">CEP:</span>
                 <p class="tw-font-medium">{{ construction.address.cep || '-' }}</p>
               </div>
+              <div>
+                <span class="tw-text-gray-600">Cidade:</span>
+                <p class="tw-font-medium">{{ construction.address.city || '-' }}</p>
+              </div>
+              <div>
+                <span class="tw-text-gray-600">Estado (UF):</span>
+                <p class="tw-font-medium">{{ construction.address.uf || '-' }}</p>
+              </div>
               <div v-if="construction.address.latitude && construction.address.longitude">
                 <span class="tw-text-gray-600">Coordenadas:</span>
                 <p class="tw-font-medium">
@@ -65,7 +73,19 @@
 
         <div class="tw-mt-6">
           <h3 class="tw-text-lg tw-font-medium tw-mb-4">Localização no Mapa</h3>
-          <div id="map" class="tw-h-[400px] tw-w-full tw-rounded-lg tw-border tw-border-gray-200"></div>
+          <div class="tw-h-[400px] tw-w-full tw-rounded-lg tw-border tw-border-gray-200">
+            <GMapMap
+              :center="mapCenter"
+              :zoom="16"
+              map-type-id="roadmap"
+              style="width: 100%; height: 400px"
+            >
+              <GMapMarker
+                v-if="hasCoordinates"
+                :position="mapCenter"
+              />
+            </GMapMap>
+          </div>
         </div>
       </v-card-text>
     </v-card>
@@ -76,12 +96,8 @@
 import { Link } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Icon } from '@iconify/vue'
-import { onMounted } from 'vue'
-import 'leaflet/dist/leaflet.css'
-
-// Coordenadas de Santarém-PA
-const SANTAREM_LAT = -2.4329
-const SANTAREM_LNG = -54.7031
+import { ref, computed, onMounted } from 'vue'
+import { SANTAREM_LAT, SANTAREM_LNG } from '@/scripts/mapConstants'
 
 const props = defineProps({
   construction: {
@@ -90,39 +106,27 @@ const props = defineProps({
   }
 })
 
-onMounted(() => {
-  // Importar Leaflet dinamicamente para evitar problemas de SSR
-  import('leaflet').then((L) => {
-    const hasCoordinates = props.construction.address?.latitude && props.construction.address?.longitude
-    
-    if (hasCoordinates) {
-      const lat = parseFloat(props.construction.address.latitude)
-      const lng = parseFloat(props.construction.address.longitude)
-      
-      if (!isNaN(lat) && !isNaN(lng)) {
-        // Inicializar o mapa
-        const map = L.map('map').setView([lat, lng], 16)
-        
-        // Adicionar camada de mapa OpenStreetMap
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map)
-        
-        // Adicionar marcador na localização
-        L.marker([lat, lng]).addTo(map)
-      }
-    } else {
-      // Se não tiver coordenadas, mostrar mapa de Santarém
-      const map = L.map('map').setView([SANTAREM_LAT, SANTAREM_LNG], 13)
-      
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      }).addTo(map)
+// Verifica se temos coordenadas válidas
+const hasCoordinates = computed(() => {
+  return props.construction.address?.latitude && 
+         props.construction.address?.longitude &&
+         !isNaN(parseFloat(props.construction.address.latitude)) &&
+         !isNaN(parseFloat(props.construction.address.longitude))
+})
+
+// Define o centro do mapa
+const mapCenter = computed(() => {
+  if (hasCoordinates.value) {
+    return {
+      lat: parseFloat(props.construction.address.latitude),
+      lng: parseFloat(props.construction.address.longitude)
     }
-  })
+  } else {
+    return { lat: SANTAREM_LAT, lng: SANTAREM_LNG }
+  }
 })
 </script>
 
 <style>
-@import 'leaflet/dist/leaflet.css';
+/* Sem necessidade de CSS adicional para o Google Maps */
 </style> 

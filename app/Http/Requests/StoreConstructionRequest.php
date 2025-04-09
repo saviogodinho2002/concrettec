@@ -30,6 +30,8 @@ class StoreConstructionRequest extends FormRequest
             'address.neighborhood' => ['nullable', 'string', 'max:255'],
             'address.complement' => ['nullable', 'string', 'max:255'],
             'address.cep' => ['nullable', 'string', 'max:10'],
+            'address.city' => ['required', 'string', 'max:100'],
+            'address.uf' => ['required', 'string', 'size:2'],
             'address.latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'address.longitude' => ['nullable', 'numeric', 'between:-180,180'],
         ];
@@ -41,7 +43,7 @@ class StoreConstructionRequest extends FormRequest
             'name.required' => 'O nome da obra é obrigatório',
             'name.max' => 'O nome da obra não pode ter mais que 255 caracteres',
             'enterprise_id.required' => 'A empresa é obrigatória',
-            'enterprise_id.exists' => 'A empresa selecionada não existe',
+            'enterprise_id.exists' => 'A empresa selecionada é inválida',
             'address.required' => 'O endereço é obrigatório',
             'address.street.required' => 'A rua é obrigatória',
             'address.street.max' => 'A rua não pode ter mais que 255 caracteres',
@@ -49,6 +51,9 @@ class StoreConstructionRequest extends FormRequest
             'address.neighborhood.max' => 'O bairro não pode ter mais que 255 caracteres',
             'address.complement.max' => 'O complemento não pode ter mais que 255 caracteres',
             'address.cep.max' => 'O CEP não pode ter mais que 10 caracteres',
+            'address.city.required' => 'A cidade é obrigatória',
+            'address.uf.required' => 'O estado (UF) é obrigatório',
+            'address.uf.size' => 'O estado (UF) deve ter 2 caracteres',
         ];
     }
 }

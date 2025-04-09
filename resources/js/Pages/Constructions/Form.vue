@@ -106,19 +106,24 @@
 
             <v-col cols="12" md="6">
               <v-text-field
-                v-model="addressData.city"
+                v-model="form.address.city"
                 label="Cidade"
+                :error-messages="form.errors['address.city']"
                 variant="outlined"
                 density="comfortable"
+                required
               />
             </v-col>
 
             <v-col cols="12" md="6">
               <v-text-field
-                v-model="addressData.state"
+                v-model="form.address.uf"
                 label="Estado"
+                :error-messages="form.errors['address.uf']"
                 variant="outlined"
                 density="comfortable"
+                maxlength="2"
+                required
               />
             </v-col>
 
@@ -210,12 +215,6 @@ const searchError = ref(null)
 const canSearch = ref(false)
 const hasAddressForCoords = ref(false)
 
-// Dados adicionais de endereço que não serão enviados no formulário
-const addressData = ref({
-  city: '',
-  state: ''
-})
-
 const props = defineProps({
   construction: {
     type: Object,
@@ -238,6 +237,8 @@ const form = useForm({
     neighborhood: props.construction?.address?.neighborhood ?? '',
     complement: props.construction?.address?.complement ?? '',
     cep: props.construction?.address?.cep ?? '',
+    city: props.construction?.address?.city ?? '',
+    uf: props.construction?.address?.uf ?? '',
     latitude: props.construction?.address?.latitude ?? '',
     longitude: props.construction?.address?.longitude ?? '',
   }
@@ -248,7 +249,7 @@ const checkRequiredFields = () => {
   canSearch.value = form.address.cep && form.address.cep.replace(/\D/g, '').length === 8
   
   // Verifica se temos dados suficientes para buscar coordenadas
-  hasAddressForCoords.value = form.address.street && addressData.value.city && addressData.value.state
+  hasAddressForCoords.value = form.address.street && form.address.city && form.address.uf
 }
 
 // Verificar campos na inicialização
@@ -293,7 +294,7 @@ watch(() => form.address.cep, () => {
   checkRequiredFields()
 })
 
-watch(() => [form.address.street, addressData.value.city, addressData.value.state], () => {
+watch(() => [form.address.street, form.address.city, form.address.uf], () => {
   checkRequiredFields()
 }, { deep: true })
 
@@ -381,9 +382,9 @@ const fetchAddressByCep = async (cep) => {
       form.address.street = viaCepResponse.data.logradouro || form.address.street
       form.address.neighborhood = viaCepResponse.data.bairro || form.address.neighborhood
       
-      // Salvar cidade e estado para uso na busca de coordenadas
-      addressData.value.city = viaCepResponse.data.localidade || ''
-      addressData.value.state = viaCepResponse.data.uf || ''
+      // Salvar cidade e estado diretamente no formulário
+      form.address.city = viaCepResponse.data.localidade || ''
+      form.address.uf = viaCepResponse.data.uf || ''
       
       // Verificar se podemos buscar coordenadas
       checkRequiredFields()
@@ -402,11 +403,11 @@ const fetchAddressByCep = async (cep) => {
   }
 }
 
-// Busca coordenadas usando o endereço completo
+// Busca coordenadas usando o Google Maps Geocoding
 const fetchCoordinates = async () => {
   try {
     // Construir o endereço sem incluir o bairro
-    const addressQuery = `${form.address.street}, ${form.address.number || ''}, ${addressData.value.city}, ${addressData.value.state}`
+    const addressQuery = `${form.address.street}, ${form.address.number || ''}, ${form.address.city}, ${form.address.uf}`
     
     const nominatimResponse = await axios.get('https://nominatim.openstreetmap.org/search', {
       params: {

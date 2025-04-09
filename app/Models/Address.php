@@ -8,6 +8,6 @@ class Address extends Model
 {
     //
     protected $fillable = [
-        'street', 'number', 'neighborhood', 'complement', 'cep', 'latitude', 'longitude',
+        'street', 'number', 'neighborhood', 'complement', 'cep', 'city', 'uf', 'latitude', 'longitude',
     ];
 }
