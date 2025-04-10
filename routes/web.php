@@ -8,14 +8,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\EnterpriseController;
 use App\Http\Controllers\ConstructionController;
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
+
+Route::redirect('/', '/dashboard');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
@@ -25,7 +19,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
+    Route::get('enviar-email-users',function (){
+        \App\Models\User::find(33)->id;
+    });
     // Rotas de usuários
     Route::resource('users', UserController::class);
 
