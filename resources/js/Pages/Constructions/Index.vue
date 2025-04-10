@@ -21,7 +21,7 @@
             <th>Nome</th>
             <th>Empresa</th>
             <th>Endereço</th>
-            <th v-if="$page.props.auth.user.permissions.includes('construction-edit') || $page.props.auth.user.permissions.includes('construction-delete')">Ações</th>
+            <th >Ações</th>
           </tr>
         </thead>
         <tbody>
@@ -29,12 +29,20 @@
             <td>{{ construction.name }}</td>
             <td>{{ construction.enterprise.name }}</td>
             <td>
-              {{ construction.address.street }}, 
+              {{ construction.address.street }},
               {{ construction.address.number }}
               {{ construction.address.neighborhood ? ` - ${construction.address.neighborhood}` : '' }}
             </td>
-            <td v-if="$page.props.auth.user.permissions.includes('construction-edit') || $page.props.auth.user.permissions.includes('construction-delete')">
+            <td >
               <div class="tw-flex tw-items-center tw-gap-2">
+                  <Link
+                      v-if="$page.props.auth.user.permissions.includes('construction-view')"
+                      :href="route('constructions.show', construction.id)"
+                      class="!tw-p-2 !tw-rounded-full !tw-text-gray-600 hover:!tw-text-primary-500 hover:!tw-bg-gray-100 !tw-transition !tw-inline-flex !tw-items-center !tw-justify-center"
+                      title="Visualizar"
+                  >
+                      <Icon icon="solar:eye-bold-duotone" width="18" height="18" />
+                  </Link>
                 <Link
                   v-if="$page.props.auth.user.permissions.includes('construction-edit')"
                   :href="route('constructions.edit', construction.id)"
@@ -90,4 +98,4 @@ const destroy = (id) => {
     router.delete(route('constructions.destroy', id))
   }
 }
-</script> 
+</script>

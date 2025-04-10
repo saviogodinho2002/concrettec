@@ -41,6 +41,7 @@ class RolePermissionSeeder extends Seeder
             'empresa' => [
                 'construction-list', // Pode ver suas obras
                 'construction-view',
+
                /* 'schedule-list', // Pode gerenciar agendamentos
                 'schedule-view',
                 'schedule-create',
@@ -48,7 +49,11 @@ class RolePermissionSeeder extends Seeder
             ],
 
             // API - sem permissões por enquanto (RN 1.5 - Autenticação obrigatória)
-            'api' => [],
+            'api' => [
+                'construction-list', // Pode ver suas obras
+                'construction-view',
+
+            ],
         ];
 
         foreach ($rolePermissions as $roleName => $permissionNames) {
