@@ -1,5 +1,5 @@
 <script setup>
-import {computed, onMounted, ref} from 'vue';
+import {computed, ref} from 'vue';
 import NavItem from './NavItem/index.vue';
 import ApplicationLogo from "@/Components/ApplicationLogo.vue";
 import {Icon} from "@iconify/vue";
@@ -20,9 +20,9 @@ const menuItemsByPermissions = computed(() => {
         .filter(item => {
             // Se não tiver permissões definidas, mostra o item
             if (!item.permissions || item.permissions.length === 0) return true;
-            
+
             // Verifica se o usuário tem pelo menos uma das permissões necessárias
-            return item.permissions.some(permission => 
+            return item.permissions.some(permission =>
                 auth.user.permissions.includes(permission)
             );
         })
@@ -139,8 +139,8 @@ function logout() {
 
             <v-main class="!tw-bg-white">
                 <div class="hr-layout tw-h-full">
-                    <v-container fluid class="page-wrapper tw-bg-[#FAFBFC] tw-h-full pt-2 rounded-xl">
-                        <div class="px-sm-3 pt-3 tw-h-full">
+                    <v-container fluid class="page-wrapper tw-bg-[#FAFBFC] tw-h-full  rounded-xl">
+                        <div class=" tw-h-full">
                             <div class="maxWidth tw-h-full">
                                 <slot/>
                             </div>

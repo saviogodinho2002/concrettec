@@ -4,8 +4,24 @@ export const menuItem = [
         icon: 'solar:layers-bold-duotone',
         BgColor: 'success',
         to: "dashboard",
-        permissions: ['dashboard-access'],
+        permissions: [],
         route:'dashboard'
+    },
+    {
+        title:'Empresas',
+        icon: 'solar:buildings-2-bold-duotone',
+        BgColor: 'primary',
+        to: "enterprises.index",
+        permissions: ['enterprise-list'],
+        route:'enterprises.*'
+    },
+    {
+        title:'Obras',
+        icon: 'emojione-monotone:building-construction',
+        BgColor: 'primary',
+        to: "constructions.index",
+        permissions: ['construction-list'],
+        route:'constructions.*'
     },
     {
         title:'Usuários',
@@ -14,21 +30,5 @@ export const menuItem = [
         to: "users.index",
         permissions: ['user-list'],
         route:'users.*'
-    },
-    {
-        title:'Empresas',
-        icon: 'solar:building-bold-duotone',
-        BgColor: 'primary',
-        to: "enterprises.index",
-        permissions: ['enterprise-list'],
-        route:'enterprises.*'
-    },
-    {
-        title:'Obras',
-        icon: 'solar:buildings-2-bold-duotone',
-        BgColor: 'primary',
-        to: "constructions.index",
-        permissions: ['construction-list'],
-        route:'constructions.*'
     },
 ]
