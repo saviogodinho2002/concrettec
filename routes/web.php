@@ -7,6 +7,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\EnterpriseController;
 use App\Http\Controllers\ConstructionController;
+use App\Http\Controllers\CityController;
 
 
 Route::redirect('/', '/dashboard');
@@ -28,6 +29,9 @@ Route::middleware('auth')->group(function () {
 
     // Rotas de obras
     Route::resource('constructions', ConstructionController::class);
+    
+    // Rota de busca de cidades
+    Route::get('/cities/search', [CityController::class, 'search'])->name('cities.search');
 });
 
 require __DIR__.'/auth.php';
