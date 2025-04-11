@@ -6,9 +6,13 @@ use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\Enterprise;
 use App\Models\User;
+use App\Notifications\CustomResetPassword;
 use App\Services\UserService;
+use App\Util\MailerUtil;
+use Hamcrest\Util;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Password;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
 use Illuminate\Routing\Controllers\Middleware;
@@ -72,17 +76,24 @@ class UserController extends Controller
 
         try {
             \Log::info('Roles sendo enviadas para criação:', ['roles' => $data['roles'] ?? []]);
-            $this->userService->createUser(
+            $createdUser = $this->userService->createUser(
                 $data,
                 $data['phone_numbers'] ?? [],
                 $data['roles'] ?? []
             );
+            try {
+                $token = Password::broker()->createToken($createdUser);
+
+                $createdUser->notify(new CustomResetPassword($token, $createdUser->email,"Você foi cadastrado nos sistema da Concrettec. Se quiser redefinir a sua senha clique no link abaixo.", ""));
+            }catch (\Exception $exception){
+                MailerUtil::sendErrorMail($exception);
+
+            }
 
             return redirect()->route('users.index')
                 ->with('success', 'Usuário criado com sucesso!');
         } catch (\Exception $e) {
-            \Log::error('Erro ao criar usuário:', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
-
+            MailerUtil::sendErrorMail($e);
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Erro ao criar usuário: ' . $e->getMessage());
