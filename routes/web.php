@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\EnterpriseController;
 use App\Http\Controllers\ConstructionController;
 use App\Http\Controllers\CityController;
+use App\Http\Controllers\RolePermissionController;
 
 
 Route::redirect('/', '/dashboard');
@@ -30,6 +31,12 @@ Route::middleware('auth')->group(function () {
 
     // Rota de busca de cidades
     Route::get('/cities/search', [CityController::class, 'search'])->name('cities.search');
+
+    // Rotas para papéis e permissões
+    Route::get('/roles-permissions', [RolePermissionController::class, 'index'])
+        ->name('roles-permissions.index');
+    Route::put('/roles/{role}/permissions', [RolePermissionController::class, 'update'])
+        ->name('roles.permissions.update');
 });
 
 require __DIR__.'/auth.php';

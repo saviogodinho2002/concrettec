@@ -68,16 +68,17 @@ function logout() {
                             <ApplicationLogo class="tw-max-w-[50px] tw-p-1 bg-primary rounded-lg"/>
                             <span class="tw-text-[25px] tw-font-medium ml-4">Concrettec</span>
                         </div>
-                       
+
                         <v-list>
                             <template v-for="(item, i) in menuItemsByPermissions">
                                 <NavItem :item="item" class="leftPadding"/>
                             </template>
+
                         </v-list>
                     </div>
 
                     <div>
-                       
+
                         <div class="tw-px-8 tw-py-4 tw-flex tw-w-full tw-cursor-pointer hover:!tw-bg-white/10">
                             <span class="icon-box py-2 tw-flex tw-items-center" @click="logout">
                                 <Icon icon="solar:logout-2-bold" width="30" height="30" class="z-index-2"/>

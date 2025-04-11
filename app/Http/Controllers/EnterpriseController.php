@@ -7,10 +7,11 @@ use App\Http\Requests\StoreEnterpriseRequest;
 use App\Models\Enterprise;
 use App\Services\EnterpriseService;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Inertia\Inertia;
 
-class EnterpriseController extends Controller
+class EnterpriseController extends Controller implements HasMiddleware
 {
     protected $enterpriseService;
 

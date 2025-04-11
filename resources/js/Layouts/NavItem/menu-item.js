@@ -31,4 +31,12 @@ export const menuItem = [
         permissions: ['user-list'],
         route:'users.*'
     },
+    {
+        title:'Papéis e Permissões',
+        icon: 'solar:users-group-two-rounded-bold-duotone',
+        BgColor: 'secondary',
+        to: "roles-permissions.index",
+        permissions: ['roles_permissions-list'],
+        route:'roles-permissions.*'
+    },
 ]

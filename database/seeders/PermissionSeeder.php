@@ -12,7 +12,8 @@ class PermissionSeeder extends Seeder
         'enterprise',
         'construction',
         'address',
-        'phone_number'
+        'phone_number',
+        'roles_permissions'
     ];
 
     private array $actions = [
