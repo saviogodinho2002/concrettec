@@ -3,59 +3,85 @@
     <template #header>
       <div class="tw-flex tw-justify-between tw-items-center">
         <h2 class="tw-text-2xl tw-font-bold">Empresas</h2>
-        <Link
-          v-if="$page.props.auth.user.permissions.includes('enterprise-create')"
-          color="primary"
-          :href="route('enterprises.create')"
-          prepend-icon="solar:add-circle-bold-duotone"
-          class="!tw-font-medium"
-        >
-          Nova Empresa
-        </Link>
       </div>
     </template>
-    <v-card class="!tw-shadow-sm !tw-border !tw-border-gray-100">
-      <v-data-table
-        :headers="headers"
-        :items="enterprises"
-        :loading="loading"
-      >
-        <template v-slot:item.type="{ item }">
-          <v-chip
-            :color="item.type === 'constructor' ? 'info' : 'success'"
-            size="small"
-          >
-            {{ item.type === 'constructor' ? 'Construtora' : 'Concreteira' }}
-          </v-chip>
-        </template>
 
-        <template v-slot:item.actions="{ item }">
-          <div class="tw-flex tw-gap-2">
-            <v-btn
-              v-if="$page.props.auth.user.permissions.includes('enterprise-view')"
-              icon="solar:eye-bold-duotone"
+    <v-card class="!tw-shadow-sm !tw-border !tw-border-gray-100 rounded-xl">
+      <v-card-text>
+        <div class="tw-flex tw-items-center tw-gap-4 tw-mb-4">
+          <v-text-field
+            v-model="search"
+            label="Buscar empresa"
+            hide-details
+            variant="outlined"
+            density="comfortable"
+            prepend-inner-icon="solar:magnifer-bold-duotone"
+            clearable
+            rounded="lg"
+            class="!tw-flex-grow"
+          />
+          <Link
+            v-if="$page.props.auth.user.permissions.includes('enterprise-create')"
+            :href="route('enterprises.create')"
+            class="!tw-shrink-0"
+          >
+            <v-btn rounded="lg" variant="flat" color="primary" class="!tw-h-[48px]">
+              <div class="tw-flex tw-gap-3 tw-items-center">
+                <Icon icon="solar:add-square-broken" width="22" height="22" />
+                Nova Empresa
+              </div>
+            </v-btn>
+          </Link>
+        </div>
+
+        <v-data-table
+          :headers="headers"
+          :items="enterprises"
+          :loading="loading"
+          :search="search"
+          :custom-filter="customFilter"
+        >
+          <template v-slot:item.type="{ item }">
+            <v-chip
+              :color="item.type === 'constructor' ? 'info' : 'success'"
               size="small"
-              variant="text"
-              :to="route('enterprises.show', item.id)"
-            />
-            <Link
-              v-if="$page.props.auth.user.permissions.includes('enterprise-edit')"
-              :href="route('enterprises.edit', item.id)"
-              class="tw-text-gray-600 hover:tw-text-primary"
             >
-              <Icon icon="solar:pen-bold-duotone" width="22" height="22" />
-            </Link>
-            <v-btn
-              v-if="$page.props.auth.user.permissions.includes('enterprise-delete')"
-              icon="solar:trash-bin-trash-bold-duotone"
-              size="small"
-              color="error"
-              variant="text"
-              @click="confirmDelete(item)"
-            />
-          </div>
-        </template>
-      </v-data-table>
+              {{ item.type === 'constructor' ? 'Construtora' : 'Concreteira' }}
+            </v-chip>
+          </template>
+
+          <template v-slot:item.actions="{ item }">
+            <div class="tw-flex tw-items-center tw-gap-2">
+              <Link
+                v-if="$page.props.auth.user.permissions.includes('enterprise-view')"
+                :href="route('enterprises.show', item.id)"
+                class="!tw-p-2 !tw-rounded-full !tw-text-gray-600 hover:!tw-text-primary-500 hover:!tw-bg-gray-100 !tw-transition !tw-inline-flex !tw-items-center !tw-justify-center"
+                title="Visualizar"
+              >
+                <Icon icon="solar:eye-bold-duotone" width="18" height="18" />
+              </Link>
+
+              <Link
+                v-if="$page.props.auth.user.permissions.includes('enterprise-edit')"
+                :href="route('enterprises.edit', item.id)"
+                class="!tw-p-2 !tw-rounded-full !tw-text-gray-600 hover:!tw-text-primary-500 hover:!tw-bg-gray-100 !tw-transition !tw-inline-flex !tw-items-center !tw-justify-center"
+                title="Editar"
+              >
+                <Icon icon="solar:pen-bold-duotone" width="18" height="18" />
+              </Link>
+
+              <button
+                v-if="$page.props.auth.user.permissions.includes('enterprise-delete')"
+                @click="confirmDelete(item)"
+                class="!tw-p-2 !tw-rounded-full !tw-text-gray-600 hover:!tw-text-red-500 hover:!tw-bg-gray-100 !tw-transition !tw-inline-flex !tw-items-center !tw-justify-center"
+                title="Excluir"
+              >
+                <Icon icon="solar:trash-bin-trash-bold-duotone" width="18" height="18" />
+              </button>
+            </div>
+          </template>
+        </v-data-table>
+      </v-card-text>
     </v-card>
 
     <!-- Dialog de confirmação de exclusão -->
@@ -81,8 +107,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useForm,Link } from '@inertiajs/vue3'
+import { ref, computed } from 'vue'
+import { useForm, Link } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Icon } from '@iconify/vue'
 
@@ -95,6 +121,7 @@ const props = defineProps({
 
 const loading = ref(false)
 const deleteDialog = ref(false)
+const search = ref('')
 const enterpriseToDelete = ref(null)
 
 const headers = [
@@ -103,8 +130,30 @@ const headers = [
   { title: 'CNPJ', key: 'cnpj', align: 'start' },
   { title: 'Tipo', key: 'type', align: 'start' },
   { title: 'Preço CP', key: 'price_cp', align: 'start' },
-  { title: 'Ações', key: 'actions', align: 'end', sortable: false }
+  { title: 'Ações', key: 'actions', align: 'start', sortable: false }
 ]
+
+// Função de filtro personalizada
+const customFilter = (value, search, item) => {
+    if (!search) return true
+
+    const searchLower = search?.toString().toLowerCase() || ''
+    const itemValue = value?.toString().toLowerCase() || ''
+
+    // Verifica se o valor corresponde diretamente
+    if (itemValue.includes(searchLower)) return true
+
+    // Verifica campos específicos do item
+    const name = item?.name?.toString().toLowerCase() || ''
+    const fantasyName = item?.fantasy_name?.toString().toLowerCase() || ''
+    const cnpj = item?.cnpj?.toString().toLowerCase() || ''
+    const type = item?.type === 'constructor' ? 'construtora' : 'concreteira'
+
+    return name.includes(searchLower) ||
+           fantasyName.includes(searchLower) ||
+           cnpj.includes(searchLower) ||
+           type.includes(searchLower)
+}
 
 const confirmDelete = (item) => {
   enterpriseToDelete.value = item

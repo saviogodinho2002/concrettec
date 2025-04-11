@@ -3,35 +3,48 @@
     <template #header>
       <div class="tw-flex tw-justify-between tw-items-center">
         <h2 class="tw-text-2xl tw-font-bold">Detalhes da Obra</h2>
-        <div class="tw-flex tw-gap-3">
-          <Link
-            :href="route('constructions.index')"
-            class="tw-text-gray-600 hover:tw-text-primary tw-flex tw-items-center tw-gap-2"
-          >
-            <Icon icon="solar:arrow-left-bold-duotone" width="22" height="22" />
-            <span>Voltar</span>
-          </Link>
-
-          <Link
-            :href="route('constructions.edit', construction.id)"
-            class="!tw-font-medium !tw-flex !tw-items-center !tw-gap-2 !tw-px-4 !tw-py-2 !tw-rounded-md !tw-bg-primary-500 !tw-text-white hover:!tw-bg-primary-600 !tw-transition"
-          >
-            <Icon icon="solar:pen-bold-duotone" width="22" height="22" />
-            <span>Editar</span>
-          </Link>
-        </div>
       </div>
     </template>
 
-    <v-card class="!tw-shadow-sm !tw-border !tw-border-gray-100 !tw-mb-6">
+    <v-card class="!tw-shadow-sm !tw-border !tw-border-gray-100 !tw-mb-6 rounded-xl">
       <v-card-text>
+        <div class="tw-flex tw-items-center tw-gap-4 tw-mb-4">
+          <Link
+            :href="route('constructions.index')"
+            class="!tw-shrink-0"
+          >
+            <v-btn rounded="lg" variant="outlined" color="gray" class="!tw-h-[48px]">
+              <div class="tw-flex tw-gap-3 tw-items-center">
+                <Icon icon="solar:arrow-left-bold-duotone" width="22" height="22" />
+                Voltar
+              </div>
+            </v-btn>
+          </Link>
+
+          <Link
+            v-if="$page.props.auth.user.permissions.includes('construction-edit')"
+            :href="route('constructions.edit', construction.id)"
+            class="!tw-shrink-0"
+          >
+            <v-btn rounded="lg" variant="flat" color="primary" class="!tw-h-[48px]">
+              <div class="tw-flex tw-gap-3 tw-items-center">
+                <Icon icon="solar:pen-bold-duotone" width="22" height="22" />
+                Editar Obra
+              </div>
+            </v-btn>
+          </Link>
+        </div>
+
         <div class="tw-p-2">
           <!-- Cabeçalho com informações principais -->
-          <div class="tw-flex tw-flex-col md:tw-flex-row tw-justify-between tw-items-start md:tw-items-center tw-pb-4 tw-border-b tw-border-gray-200">
+          <v-divider class="!tw-opacity-100 mb-3"></v-divider>
+          <div class="tw-flex tw-flex-col md:tw-flex-row tw-justify-between tw-items-start md:tw-items-center tw-border-gray-200">
             <div>
               <h3 class="tw-text-xl tw-font-medium tw-mb-1">{{ construction.name }}</h3>
               <p class="tw-text-gray-600 tw-flex tw-items-center tw-gap-2">
-                <Icon icon="solar:building-bold-duotone" width="18" height="18" class="tw-mb-0.5" />
+                <div class="tw-w-8 tw-h-8 tw-bg-primary-100 tw-rounded-full tw-flex tw-items-center tw-justify-center tw-flex-shrink-0">
+                    <Icon icon="solar:buildings-3-bold-duotone" width="18" height="18" class="tw-text-primary-500" />
+                  </div>
                 <span>{{ construction.enterprise.name }}</span>
               </p>
             </div>
@@ -106,26 +119,6 @@
                   </div>
                 </div>
 
-                <div class="tw-flex tw-gap-3">
-                  <div class="tw-w-8 tw-h-8 tw-bg-primary-100 tw-rounded-full tw-flex tw-items-center tw-justify-center tw-flex-shrink-0">
-                    <Icon icon="solar:map-arrow-square-bold-duotone" width="18" height="18" class="tw-text-primary-500" />
-                  </div>
-                  <div>
-                    <p class="tw-text-sm tw-text-gray-500">CEP</p>
-                    <p class="tw-font-medium">{{ construction.address.cep || '-' }}</p>
-                  </div>
-                </div>
-
-                <div class="tw-flex tw-gap-3">
-                  <div class="tw-w-8 tw-h-8 tw-bg-primary-100 tw-rounded-full tw-flex tw-items-center tw-justify-center tw-flex-shrink-0">
-                    <Icon icon="solar:map-point-bold-duotone" width="18" height="18" class="tw-text-primary-500" />
-                  </div>
-                  <div>
-                    <p class="tw-text-sm tw-text-gray-500">Cidade/UF</p>
-                    <p class="tw-font-medium">{{ (construction.address.city.name) }}/{{ construction.address.city.uf || '-' }}</p>
-                  </div>
-                </div>
-
                 <div v-if="hasCoordinates" class="tw-flex tw-gap-3">
                   <div class="tw-w-8 tw-h-8 tw-bg-primary-100 tw-rounded-full tw-flex tw-items-center tw-justify-center tw-flex-shrink-0">
                     <Icon icon="solar:gps-bold-duotone" width="18" height="18" class="tw-text-primary-500" />
@@ -153,15 +146,15 @@
     </v-card>
 
     <!-- Mapa -->
-    <v-card class="!tw-shadow-sm !tw-border !tw-border-gray-100">
+    <v-card class="!tw-shadow-sm !tw-border !tw-border-gray-100 rounded-xl">
       <v-card-text>
         <h4 class="tw-text-lg tw-font-medium tw-mb-4 tw-flex tw-items-center tw-gap-2">
           <Icon icon="solar:map-bold-duotone" width="22" height="22" />
           Localização no Mapa
         </h4>
-        
+
         <div id="map" class="tw-h-[450px] tw-w-full tw-rounded-lg tw-overflow-hidden tw-shadow-sm"></div>
-        
+
         <div v-if="!hasCoordinates" class="tw-mt-4 tw-p-3 tw-bg-yellow-50 tw-border tw-border-yellow-100 tw-rounded-md tw-flex tw-items-center tw-gap-2">
           <Icon icon="solar:info-circle-bold-duotone" width="20" height="20" class="tw-text-yellow-500" />
           <span class="tw-text-yellow-700">
@@ -190,7 +183,7 @@ const props = defineProps({
 
 // Verifica se temos coordenadas válidas
 const hasCoordinates = computed(() => {
-  return props.construction.address?.latitude && 
+  return props.construction.address?.latitude &&
          props.construction.address?.longitude &&
          !isNaN(parseFloat(props.construction.address.latitude)) &&
          !isNaN(parseFloat(props.construction.address.longitude))
@@ -203,7 +196,7 @@ onMounted(() => {
     // Definir o centro do mapa
     let mapCenter = [SANTAREM_LAT, SANTAREM_LNG];
     let zoomLevel = CITY_ZOOM;
-    
+
     // Se tivermos coordenadas, usá-las
     if (hasCoordinates.value) {
       mapCenter = [
@@ -212,7 +205,7 @@ onMounted(() => {
       ];
       zoomLevel = ADDRESS_ZOOM;
     }
-    
+
     // Inicializar o mapa
     const map = L.map('map').setView(mapCenter, zoomLevel);
 
@@ -225,13 +218,13 @@ onMounted(() => {
     if (hasCoordinates.value) {
       // Criar ícone personalizado para o marcador
       const marker = L.marker(mapCenter).addTo(map);
-      
+
       // Adicionar popup com informações do endereço
       marker.bindPopup(`
         <strong>${props.construction.name}</strong><br>
         ${props.construction.address.street}, ${props.construction.address.number || 'S/N'}<br>
-        ${props.construction.address.neighborhood}, 
-        ${typeof props.construction.address.city === 'object' ? props.construction.address.city.name : props.construction.address.city} - 
+        ${props.construction.address.neighborhood},
+        ${typeof props.construction.address.city === 'object' ? props.construction.address.city.name : props.construction.address.city} -
         ${typeof props.construction.address.city === 'object' ? props.construction.address.city.uf : props.construction.address.uf}
       `).openPopup();
     }

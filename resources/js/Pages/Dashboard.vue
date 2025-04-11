@@ -1,15 +1,18 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/vue3';
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import FullCalendar from '@fullcalendar/vue3';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import DonutChart from '@/Components/DonutChart.vue';
 import { Icon } from '@iconify/vue';
 
-const totalEmpresas = ref(85);
-const obrasAtivas = ref(5);
+
+const props = defineProps({
+    indicator:Object
+})
+
 
 const agendamentosData = {
   aprovados: 20,
@@ -77,14 +80,14 @@ const headers = {
 
 const cardData = [
     {
-        value: totalEmpresas,
+        value: props.indicator.total_enterprises,
         label: 'Total Empresas',
         icon: 'solar:buildings-2-bold-duotone',
         bgColor: 'tw-bg-pink-100',
         iconColor: 'tw-bg-[#ec4899]'
     },
     {
-        value: obrasAtivas,
+        value: props.indicator.total_constructions,
         label: 'Obras ativas',
         icon: 'emojione-monotone:building-construction',
         bgColor: 'tw-bg-orange-50',
@@ -109,18 +112,18 @@ const cardData = [
                     <v-card variant="flat" class="h-100 px-5 py-2 rounded-xl">
                         <!-- Informações Gerais -->
                         <h2 class="text-h6 font-weight-bold mb-4 ">Informações gerais</h2>
-                    
+
                         <!-- Cards em Grid -->
                         <div class="tw-flex tw-gap-4 mb-4">
-                            <div v-for="(card, index) in cardData" :key="index" 
+                            <div v-for="(card, index) in cardData" :key="index"
                                  :class="['flex-1 rounded-lg pa-4', card.bgColor]">
                                 <div class="d-flex flex-column h-100 " >
-                                    <Icon 
+                                    <Icon
                                         :class="card.iconColor"
-                                        :icon="card.icon" 
+                                        :icon="card.icon"
                                         color="white"
-                                        height="45" 
-                                        width="45" 
+                                        height="45"
+                                        width="45"
                                         class="mb-2 tw-rounded-full tw-p-2 "
                                     />
                                     <span class="text-h3 font-weight-bold mb-1">{{ card.value }}</span>
@@ -257,7 +260,7 @@ const cardData = [
 
 <style>
 .tw-calendar-container {
-    
+
     width: 100%;
 }
 

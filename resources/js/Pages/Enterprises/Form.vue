@@ -3,18 +3,11 @@
     <template #header>
       <div class="tw-flex tw-justify-between tw-items-center">
         <h2 class="tw-text-2xl tw-font-bold">{{ enterprise ? 'Editar' : 'Nova' }} Empresa</h2>
-        <Link
-          :href="route('enterprises.index')"
-          class="tw-text-gray-600 hover:tw-text-primary tw-flex tw-items-center tw-gap-2"
-        >
-          <Icon icon="solar:arrow-left-bold-duotone" width="22" height="22" />
-          <span>Voltar</span>
-        </Link>
       </div>
     </template>
 
     <v-form @submit.prevent="submit">
-      <v-card class="!tw-shadow-sm !tw-border !tw-border-gray-100">
+      <v-card class="!tw-shadow-sm !tw-border !tw-border-gray-100 rounded-xl">
         <v-card-text>
           <v-row>
             <v-col cols="12" md="6">
@@ -25,6 +18,7 @@
                 variant="outlined"
                 density="comfortable"
                 required
+                hide-details="auto"
               />
             </v-col>
 
@@ -105,22 +99,37 @@
               />
             </v-col>
           </v-row>
+
+          <v-divider thickness="1" class="tw-my-6"></v-divider>
+
+          <div class="tw-flex tw-justify-between tw-items-center tw-mb-3">
+            <Link
+              :href="route('enterprises.index')"
+              class="!tw-shrink-0"
+            >
+              <v-btn rounded="lg" variant="outlined" color="gray" class="!tw-h-[48px]">
+                <div class="tw-flex tw-gap-3 tw-items-center">
+                  <Icon icon="solar:arrow-left-bold-duotone" width="22" height="22" />
+                  Voltar
+                </div>
+              </v-btn>
+            </Link>
+
+            <v-btn
+              color="primary"
+              type="submit"
+              :loading="form.processing"
+              rounded="lg"
+              class="!tw-h-[48px] !tw-font-medium"
+            >
+              <div class="tw-flex tw-gap-3 tw-items-center">
+                <Icon icon="solar:add-square-bold-duotone" width="22" height="22" />
+                {{ enterprise ? 'Atualizar' : 'Criar' }} Empresa
+              </div>
+            </v-btn>
+          </div>
+
         </v-card-text>
-
-        <v-divider></v-divider>
-
-        <v-card-actions class="tw-p-4">
-          <v-spacer />
-          <v-btn
-            color="primary"
-            type="submit"
-            :loading="form.processing"
-            class="!tw-font-medium tw-flex tw-items-center tw-gap-2"
-          >
-            <Icon icon="solar:disk-bold-duotone" width="22" height="22" />
-            {{ enterprise ? 'Atualizar' : 'Criar' }}
-          </v-btn>
-        </v-card-actions>
       </v-card>
     </v-form>
   </AuthenticatedLayout>

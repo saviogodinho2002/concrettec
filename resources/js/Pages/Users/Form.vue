@@ -3,19 +3,14 @@
     <template #header>
       <div class="tw-flex tw-justify-between tw-items-center">
         <h2 class="tw-text-2xl tw-font-bold">{{ user ? 'Editar' : 'Novo' }} Usuário</h2>
-        <Link
-          :href="route('users.index')"
-          class="tw-text-gray-600 hover:tw-text-primary tw-flex tw-items-center tw-gap-2"
-        >
-          <Icon icon="solar:arrow-left-bold-duotone" width="22" height="22" />
-          <span>Voltar</span>
-        </Link>
       </div>
     </template>
 
     <v-form @submit.prevent="submit">
-      <v-card class="!tw-shadow-sm !tw-border !tw-border-gray-100">
+      <v-card class="!tw-shadow-sm !tw-border !tw-border-gray-100 rounded-xl">
         <v-card-text>
+        
+
           <v-row>
             <!-- Dados básicos -->
             <v-col cols="12">
@@ -31,6 +26,7 @@
                 density="comfortable"
                 required
                 autocomplete="name"
+                hide-details="auto"
               />
             </v-col>
 
@@ -107,12 +103,13 @@
                         v-model="form.roles"
                         :label="formatRoleName(role.name)"
                         :value="role.name"
+                        hide-details="auto"
                         color="secondary"
                         density="comfortable"
                         class="tw-w-full"
                         @update:model-value="checkRoleTypes"
-                    />
-</div>
+                    ></v-checkbox>
+                  </div>
               </div>
 
               <div class="tw-mt-3 tw-text-sm tw-p-2 tw-bg-blue-50 tw-rounded-md" v-if="devMode">
@@ -168,22 +165,37 @@
               </div>
             </v-col>
           </v-row>
+
+          <v-divider thickness="1" class="tw-my-6"></v-divider>
+
+          <div class="tw-flex tw-justify-between tw-items-center tw-mb-3">
+            <Link
+              :href="route('users.index')"
+              class="!tw-shrink-0"
+            >
+              <v-btn rounded="lg" variant="outlined" color="gray" class="!tw-h-[48px]">
+                <div class="tw-flex tw-gap-3 tw-items-center">
+                  <Icon icon="solar:arrow-left-bold-duotone" width="22" height="22" />
+                  Voltar
+                </div>
+              </v-btn>
+            </Link>
+
+            <v-btn
+              color="primary"
+              type="submit"
+              :loading="form.processing"
+              rounded="lg"
+              class="!tw-h-[48px] !tw-font-medium"
+            >
+              <div class="tw-flex tw-gap-3 tw-items-center">
+                <Icon icon="solar:add-square-bold-duotone" width="22" height="22" />
+                {{ user ? 'Atualizar' : 'Criar' }} Usuário
+              </div>
+            </v-btn>
+          </div>
+
         </v-card-text>
-
-        <v-divider></v-divider>
-
-        <v-card-actions class="tw-p-4">
-          <v-spacer />
-          <v-btn
-            color="primary"
-            type="submit"
-            :loading="form.processing"
-            class="!tw-font-medium tw-flex tw-items-center tw-gap-2"
-          >
-            <Icon icon="solar:disk-bold-duotone" width="22" height="22" />
-            {{ user ? 'Atualizar' : 'Criar' }}
-          </v-btn>
-        </v-card-actions>
       </v-card>
     </v-form>
   </AuthenticatedLayout>
@@ -233,8 +245,6 @@ const form = useForm({
 
 // Debugging
 const devMode = ref(true); // Set to false in production
-console.log('Available roles:', props.roles)
-console.log('Initial roles selected:', props.userRoles)
 
 // Verificar se tem perfil de sistema selecionado
 const isSystemRole = computed(() => {
@@ -251,8 +261,6 @@ watch(isSystemRole, (newValue) => {
 
 // Verificar tipos de perfis selecionados e previnir valores inválidos
 const checkRoleTypes = () => {
-  console.log('Roles after change:', form.roles)
-
   // Certificar que apenas valores válidos estejam na lista
   form.roles = form.roles.filter(role => {
     return props.roles.some(r => r.name === role)
