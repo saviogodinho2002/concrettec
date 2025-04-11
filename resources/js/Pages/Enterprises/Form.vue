@@ -171,3 +171,9 @@ const submit = () => {
   }
 }
 </script>
+
+<style>
+.v-divider {
+    opacity: 1;
+}
+</style>

@@ -26,6 +26,7 @@
         "@fullcalendar/daygrid": "^6.1.17",
         "@fullcalendar/interaction": "^6.1.17",
         "@fullcalendar/vue3": "^6.1.17",
+        "@mdi/font": "^7.4.47",
         "chart.js": "^4.4.8",
         "leaflet": "^1.9.4",
         "maska": "^2.1.11",

@@ -10,7 +10,7 @@ import { createVuetify } from 'vuetify'
 import { pt } from 'vuetify/locale'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
-import { aliases, mdi } from 'vuetify/iconsets/mdi'
+import '@mdi/font/css/materialdesignicons.css'
 
 // Importação do Toast
 import Toast from "vue-toastification";
@@ -41,23 +41,21 @@ const vuetify = createVuetify({
     directives,
     locale: {
         locale: 'pt',
-        messages:{pt}
+        messages: { pt }
     },
-    icons: {
-        defaultSet: 'mdi',
-        aliases,
-        sets: {
-          mdi,
-        },
-      },
-      theme: {
+    theme: {
         defaultTheme: 'DEFAULT_THEME',
         themes: {
             DEFAULT_THEME,
         }
     },
-  })
-
+    defaults: {
+        VCheckbox: {
+            color: 'success',
+            hideDetails: true,
+        }
+    }
+})
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,

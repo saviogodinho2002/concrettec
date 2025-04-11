@@ -2,19 +2,20 @@
   <AuthenticatedLayout>
     <template #header>
       <div class="tw-flex tw-justify-between tw-items-center">
-        <h2 class="tw-text-2xl tw-font-bold">{{ user ? 'Editar' : 'Novo' }} Usuário</h2>
+        <h2 class="tw-text-2xl tw-font-bold tw-text-gray-800">{{ user ? 'Editar' : 'Novo' }} Usuário</h2>
       </div>
     </template>
 
     <v-form @submit.prevent="submit">
-      <v-card class="!tw-shadow-sm !tw-border !tw-border-gray-100 rounded-xl">
-        <v-card-text>
-        
-
+      <v-card class="!tw-shadow-sm !tw-border !tw-border-gray-100 tw-rounded-xl">
+        <v-card-text class="!tw-p-6">
           <v-row>
-            <!-- Dados básicos -->
+            <!-- Seção: Dados básicos -->
             <v-col cols="12">
-              <h3 class="tw-text-lg tw-font-medium tw-mb-4">Dados do Usuário</h3>
+              <div class="tw-flex tw-items-center tw-gap-2 tw-mb-6">
+                <Icon icon="solar:user-id-bold-duotone" class="tw-text-emerald-600" width="24" height="24" />
+                <h3 class="tw-text-lg tw-font-semibold tw-text-gray-800">Dados do Usuário</h3>
+              </div>
             </v-col>
 
             <v-col cols="12" md="6">
@@ -27,6 +28,8 @@
                 required
                 autocomplete="name"
                 hide-details="auto"
+                prepend-inner-icon="solar:user-bold-duotone"
+                class="tw-mb-4"
               />
             </v-col>
 
@@ -40,6 +43,8 @@
                 required
                 autocomplete="email"
                 type="email"
+                prepend-inner-icon="solar:letter-bold-duotone"
+                class="tw-mb-4"
               />
             </v-col>
 
@@ -54,6 +59,8 @@
                 autocomplete="new-password"
                 type="password"
                 :placeholder="user ? 'Deixe em branco para manter a senha atual' : ''"
+                prepend-inner-icon="solar:lock-password-bold-duotone"
+                class="tw-mb-4"
               />
             </v-col>
 
@@ -66,6 +73,8 @@
                 :required="!user"
                 autocomplete="new-password"
                 type="password"
+                prepend-inner-icon="solar:lock-password-bold-duotone"
+                class="tw-mb-4"
               />
             </v-col>
 
@@ -83,90 +92,102 @@
                 :disabled="isSystemRole"
                 :hint="isSystemRole ? 'Usuários com perfis de sistema não podem ter empresa vinculada' : ''"
                 persistent-hint
+                prepend-inner-icon="solar:buildings-2-bold-duotone"
+                class="tw-mb-4"
               />
             </v-col>
 
-            <!-- Reorganização dos perfis e telefones (lado a lado) -->
-            <v-col cols="12">
-              <h3 class="tw-text-lg tw-font-medium tw-mb-4">Perfis e Contatos</h3>
+            <!-- Seção: Perfis e Contatos -->
+            <v-col cols="12" class="!tw-mt-4">
+              <div class="tw-flex tw-items-center tw-gap-2 tw-mb-6">
+                <Icon icon="solar:users-group-rounded-bold-duotone" class="tw-text-emerald-600" width="24" height="24" />
+                <h3 class="tw-text-lg tw-font-semibold tw-text-gray-800">Perfis e Contatos</h3>
+              </div>
             </v-col>
 
             <v-col cols="12" md="6">
-              <h4 class="tw-font-medium tw-mb-3">Perfis do Usuário</h4>
-              <div class="tw-flex tw-flex-wrap tw-gap-3">
+              <div class="tw-bg-gray-50/50 tw-p-4 tw-rounded-xl tw-border tw-border-gray-100">
+                <h4 class="tw-font-medium tw-mb-4 tw-text-gray-700">Perfis do Usuário</h4>
+                <div class="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-gap-2">
                   <div
-                      v-for="role in roles"
-                      :key="role.id"
-                      class="tw-flex-basis-[45%] tw-mb-3 tw-p-2 tw-bg-gray-50 tw-rounded-md tw-min-h-[56px]"
+                    v-for="role in roles"
+                    :key="role.id"
+                    class="tw-bg-white tw-p-3 tw-rounded-lg tw-border tw-border-gray-100 tw-transition-all hover:tw-border-emerald-200"
                   >
                     <v-checkbox
-                        v-model="form.roles"
-                        :label="formatRoleName(role.name)"
-                        :value="role.name"
-                        hide-details="auto"
-                        color="secondary"
-                        density="comfortable"
-                        class="tw-w-full"
-                        @update:model-value="checkRoleTypes"
-                    ></v-checkbox>
+                      v-model="form.roles"
+                      :label="formatRoleName(role.name)"
+                      :value="role.name"
+                      hide-details="auto"
+                      color="success"
+                      density="comfortable"
+                      class="!tw-m-0"
+                      @update:model-value="checkRoleTypes"
+                    />
                   </div>
-              </div>
+                </div>
 
-              <div class="tw-mt-3 tw-text-sm tw-p-2 tw-bg-blue-50 tw-rounded-md" v-if="devMode">
-                <div> Roles selecionadas: {{ form.roles.join(', ') }}</div>
-              </div>
-
-              <div v-if="form.errors.roles" class="tw-text-red-500 tw-mt-2 tw-text-sm">
-                {{ form.errors.roles }}
+                <div v-if="form.errors.roles" class="tw-text-red-500 tw-mt-3 tw-text-sm">
+                  {{ form.errors.roles }}
+                </div>
               </div>
             </v-col>
 
             <v-col cols="12" md="6">
-              <div class="tw-flex tw-justify-between tw-items-center tw-mb-3">
-                <h4 class="tw-font-medium">Telefones</h4>
-                <v-btn
-                  color="primary"
-                  variant="text"
-                  @click="addPhoneNumber"
-                  class="!tw-font-medium !tw-flex !tw-items-center !tw-gap-1 !tw-px-2 !tw-py-1"
-                  size="small"
-                >
-                  <Icon icon="solar:add-circle-bold-duotone" width="16" height="16" />
-                  <span>Adicionar</span>
-                </v-btn>
-              </div>
+              <div class="tw-bg-gray-50/50 tw-p-4 tw-rounded-xl tw-border tw-border-gray-100">
+                <div class="tw-flex tw-justify-between tw-items-center tw-mb-4">
+                  <h4 class="tw-font-medium tw-text-gray-700">Telefones</h4>
+                  <v-btn
+                    color="success"
+                    variant="tonal"
+                    @click="addPhoneNumber"
+                    class="!tw-font-medium"
+                    size="small"
+                    prepend-icon="solar:add-circle-bold-duotone"
+                  >
+                    Adicionar
+                  </v-btn>
+                </div>
 
-              <div v-if="form.phone_numbers.length === 0" class="tw-text-gray-500 tw-mb-3 tw-text-sm tw-px-1">
-                Nenhum telefone cadastrado
-              </div>
+                <div v-if="form.phone_numbers.length === 0" class="tw-bg-gray-100/50 tw-rounded-lg tw-p-4 tw-text-gray-500 tw-text-sm tw-text-center">
+                  <Icon icon="solar:phone-bold-duotone" class="tw-mb-2" width="24" height="24" />
+                  <p>Nenhum telefone cadastrado</p>
+                </div>
 
-              <div v-for="(phone, index) in form.phone_numbers" :key="index" class="tw-flex tw-items-center tw-gap-2 tw-mb-3">
-                <v-text-field
-                  v-model="phone.phone_number"
-                  label="Número de Telefone"
-                  variant="outlined"
-                  density="comfortable"
-                  v-maska
-                  data-maska="(##) #####-####"
-                  hide-details
-                  class="tw-flex-grow"
-                />
+                <div v-else class="tw-space-y-2">
+                  <div 
+                    v-for="(phone, index) in form.phone_numbers" 
+                    :key="index" 
+                    class="tw-flex tw-items-center tw-gap-2"
+                  >
+                    <v-text-field
+                      v-model="phone.phone_number"
+                      label="Número de Telefone"
+                      variant="outlined"
+                      density="comfortable"
+                      v-maska
+                      data-maska="(##) #####-####"
+                      hide-details
+                      prepend-inner-icon="solar:phone-bold-duotone"
+                      class="tw-flex-grow"
+                    />
 
-                <v-btn
-                  color="error"
-                  variant="text"
-                  icon
-                  @click="removePhoneNumber(index)"
-                  size="small"
-                  class="!tw-mt-0"
-                >
-                  <Icon icon="solar:trash-bin-trash-bold-duotone" width="18" height="18" />
-                </v-btn>
+                    <v-btn
+                      color="error"
+                      variant="tonal"
+                      icon
+                      @click="removePhoneNumber(index)"
+                      size="small"
+                    >
+                      <Icon icon="solar:trash-bin-trash-bold-duotone" width="18" height="18" />
+                    </v-btn>
+                  </div>
+                </div>
               </div>
             </v-col>
           </v-row>
 
-          <v-divider thickness="1" class="tw-my-6"></v-divider>
+          <v-divider class="tw-my-6 !tw-border-gray-200"></v-divider>
 
           <div class="tw-flex tw-justify-between tw-items-center tw-mb-3">
             <Link
@@ -194,7 +215,6 @@
               </div>
             </v-btn>
           </div>
-
         </v-card-text>
       </v-card>
     </v-form>
@@ -314,3 +334,27 @@ const submit = () => {
   }
 }
 </script>
+
+<style scoped>
+.v-divider {
+  opacity: 1;
+}
+
+:deep(.v-btn--icon.v-btn--density-default) {
+  width: 38px;
+  height: 38px;
+}
+
+:deep(.v-field__input) {
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
+}
+
+:deep(.v-field__prepend-inner) {
+  padding-inline-start: 12px !important;
+}
+
+:deep(.v-label) {
+  font-size: 0.875rem !important;
+}
+</style>
