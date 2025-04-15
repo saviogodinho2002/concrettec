@@ -26,6 +26,13 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (Throwable $exception,  $request) {
+            if (
+                $exception instanceof \Illuminate\Auth\AuthenticationException ||
+                $exception instanceof \Illuminate\Validation\ValidationException ||
+                $exception instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+            ) {
+                return null; // Não notifica nem intercepta, deixa Laravel seguir o fluxo
+            }
             \App\Util\MailerUtil::sendErrorMail($exception);
         });
     })->create();

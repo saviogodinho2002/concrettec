@@ -35,10 +35,10 @@ class MailerUtil
             $content['body'] = request()->all();
             $content['ip'] = request()->ip();
 
-            Mail::to('williamsbsi@gmail.com')
+            Mail::to('saviogmoiagaia.2001@gmail.com')
                 ->cc([
                     "daniells.developer@gmail.com",
-                    'saviogmoiagaia.2001@gmail.com'
+                    'obisoft.concrettec@gmail.com',
                 ])
                 ->send(new ExceptionOccured($content));
 
