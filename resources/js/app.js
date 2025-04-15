@@ -18,7 +18,7 @@ import "vue-toastification/dist/index.css";
 
 import { DEFAULT_THEME } from './Themes/DefaultTheme';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName = import.meta.env.VITE_APP_NAME || 'Concrettec';
 
 // Opções do Toast
 const toastOptions = {
