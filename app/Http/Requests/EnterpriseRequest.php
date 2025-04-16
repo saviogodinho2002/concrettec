@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\EnterpriseTypes;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Enum;
 
 class EnterpriseRequest extends FormRequest
 {
@@ -16,7 +18,8 @@ class EnterpriseRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'type' => ['required', Rule::in(['Concreteira', 'Construtora'])],
+            'type' => ['required', new Enum(EnterpriseTypes::class)],
+
             'cnpj' => [
                 'required',
                 'string',

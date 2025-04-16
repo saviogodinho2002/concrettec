@@ -12,4 +12,6 @@ export const SANTAREM_LNG = -54.7031;
 export const CITY_ZOOM = 13;
 
 // Zoom padrão para visualização de endereços específicos
-export const ADDRESS_ZOOM = 16; 
+export const ADDRESS_ZOOM = 16;
+
+export const ENTERPRISES_TYPES = {'concreteira': 'Concreteira', 'construcao': 'Construção'};

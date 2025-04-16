@@ -43,10 +43,10 @@
         >
           <template v-slot:item.type="{ item }">
             <v-chip
-              :color="item.type === 'constructor' ? 'info' : 'success'"
+              :color="item.type === 'construcao' ? 'info' : 'success'"
               size="small"
             >
-              {{ item.type === 'constructor' ? 'Construtora' : 'Concreteira' }}
+              {{ ENTERPRISES_TYPES[ item.type]  }}
             </v-chip>
           </template>
 
@@ -111,6 +111,7 @@ import { ref, computed } from 'vue'
 import { useForm, Link } from '@inertiajs/vue3'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Icon } from '@iconify/vue'
+import {ENTERPRISES_TYPES} from "../../scripts/mapConstants.js";
 
 const props = defineProps({
   enterprises: {
