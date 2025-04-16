@@ -1,9 +1,6 @@
 <script setup>
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
 import { Link, useForm, usePage } from '@inertiajs/vue3';
+import { Icon } from '@iconify/vue';
 
 defineProps({
     mustVerifyEmail: {
@@ -24,88 +21,86 @@ const form = useForm({
 
 <template>
     <section>
-        <header>
-            <h2 class="text-lg font-medium text-gray-900">
-                Profile Information
-            </h2>
+        <form @submit.prevent="form.patch(route('profile.update'))" class="tw-space-y-6">
+            <v-row>
+                <v-col cols="12" md="6">
+                    <v-text-field
+                        v-model="form.name"
+                        label="Nome"
+                        type="text"
+                        :error-messages="form.errors.name"
+                        variant="outlined"
+                        density="comfortable"
+                        required
+                        autofocus
+                        autocomplete="name"
+                        prepend-inner-icon="solar:user-bold-duotone"
+                        hide-details="auto"
+                    />
+                </v-col>
 
-            <p class="mt-1 text-sm text-gray-600">
-                Update your account's profile information and email address.
-            </p>
-        </header>
+                <v-col cols="12" md="6">
+                    <v-text-field
+                        v-model="form.email"
+                        label="E-mail"
+                        type="email"
+                        :error-messages="form.errors.email"
+                        variant="outlined"
+                        density="comfortable"
+                        required
+                        autocomplete="email"
+                        prepend-inner-icon="solar:letter-bold-duotone"
+                        hide-details="auto"
+                    />
+                </v-col>
+            </v-row>
 
-        <form
-            @submit.prevent="form.patch(route('profile.update'))"
-            class="mt-6 space-y-6"
-        >
-            <div>
-                <InputLabel for="name" value="Name" />
+            <div v-if="mustVerifyEmail && user.email_verified_at === null" class="tw-rounded-lg tw-bg-blue-50 tw-p-4 tw-mt-4">
+                <div class="tw-flex tw-items-start tw-gap-3">
+                    <Icon icon="solar:info-circle-bold-duotone" class="tw-text-blue-500 tw-mt-0.5" width="20" height="20" />
+                    <div>
+                        <p class="tw-text-sm tw-text-blue-800">
+                            Seu endereço de e-mail não foi verificado.
+                            <Link
+                                :href="route('verification.send')"
+                                method="post"
+                                as="button"
+                                class="tw-font-medium tw-text-blue-700 hover:tw-text-blue-800 tw-underline"
+                            >
+                                Clique aqui para reenviar o e-mail de verificação.
+                            </Link>
+                        </p>
 
-                <TextInput
-                    id="name"
-                    type="text"
-                    class="mt-1 block w-full"
-                    v-model="form.name"
-                    required
-                    autofocus
-                    autocomplete="name"
-                />
-
-                <InputError class="mt-2" :message="form.errors.name" />
-            </div>
-
-            <div>
-                <InputLabel for="email" value="Email" />
-
-                <TextInput
-                    id="email"
-                    type="email"
-                    class="mt-1 block w-full"
-                    v-model="form.email"
-                    required
-                    autocomplete="username"
-                />
-
-                <InputError class="mt-2" :message="form.errors.email" />
-            </div>
-
-            <div v-if="mustVerifyEmail && user.email_verified_at === null">
-                <p class="mt-2 text-sm text-gray-800">
-                    Your email address is unverified.
-                    <Link
-                        :href="route('verification.send')"
-                        method="post"
-                        as="button"
-                        class="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    >
-                        Click here to re-send the verification email.
-                    </Link>
-                </p>
-
-                <div
-                    v-show="status === 'verification-link-sent'"
-                    class="mt-2 text-sm font-medium text-green-600"
-                >
-                    A new verification link has been sent to your email address.
+                        <div
+                            v-show="status === 'verification-link-sent'"
+                            class="tw-mt-2 tw-text-sm tw-font-medium tw-text-blue-700"
+                        >
+                            Um novo link de verificação foi enviado para seu endereço de e-mail.
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="flex items-center gap-4">
-                <PrimaryButton :disabled="form.processing">Save</PrimaryButton>
-
-                <Transition
-                    enter-active-class="transition ease-in-out"
-                    enter-from-class="opacity-0"
-                    leave-active-class="transition ease-in-out"
-                    leave-to-class="opacity-0"
+            <div class="tw-flex tw-items-center tw-gap-4">
+                <v-btn
+                    color="success"
+                    type="submit"
+                    :loading="form.processing"
+                    :disabled="form.processing"
+                    prepend-icon="solar:diskette-bold-duotone"
+                    rounded="lg"
                 >
-                    <p
-                        v-if="form.recentlySuccessful"
-                        class="text-sm text-gray-600"
-                    >
-                        Saved.
-                    </p>
-                </Transition>
+                    Salvar
+                </v-btn>
+
+                <v-snackbar
+                    v-model="form.recentlySuccessful"
+                    timeout="2000"
+                    color="success"
+                    location="top"
+                >
+                    Informações atualizadas com sucesso!
+                </v-snackbar>
             </div>
         </form>
     </section>

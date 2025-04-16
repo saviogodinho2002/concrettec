@@ -1,15 +1,9 @@
 <script setup>
-import DangerButton from '@/Components/DangerButton.vue';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import Modal from '@/Components/Modal.vue';
-import SecondaryButton from '@/Components/SecondaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
 import { useForm } from '@inertiajs/vue3';
-import { nextTick, ref } from 'vue';
+import { ref } from 'vue';
+import { Icon } from '@iconify/vue';
 
 const confirmingUserDeletion = ref(false);
-const passwordInput = ref(null);
 
 const form = useForm({
     password: '',
@@ -17,92 +11,92 @@ const form = useForm({
 
 const confirmUserDeletion = () => {
     confirmingUserDeletion.value = true;
-
-    nextTick(() => passwordInput.value.focus());
 };
 
 const deleteUser = () => {
     form.delete(route('profile.destroy'), {
         preserveScroll: true,
         onSuccess: () => closeModal(),
-        onError: () => passwordInput.value.focus(),
         onFinish: () => form.reset(),
     });
 };
 
 const closeModal = () => {
     confirmingUserDeletion.value = false;
-
     form.clearErrors();
     form.reset();
 };
 </script>
 
 <template>
-    <section class="space-y-6">
-        <header>
-            <h2 class="text-lg font-medium text-gray-900">
-                Delete Account
-            </h2>
-
-            <p class="mt-1 text-sm text-gray-600">
-                Once your account is deleted, all of its resources and data will
-                be permanently deleted. Before deleting your account, please
-                download any data or information that you wish to retain.
+    <section>
+        <div class="tw-bg-red-50 tw-p-4 tw-rounded-lg tw-border tw-border-red-100">
+            <p class="tw-text-sm tw-text-red-800 tw-mb-4">
+                Ao excluir sua conta, todos os seus dados serão permanentemente removidos. Antes de prosseguir, 
+                faça o download de quaisquer dados ou informações que deseja manter.
             </p>
-        </header>
 
-        <DangerButton @click="confirmUserDeletion">Delete Account</DangerButton>
+            <v-btn
+                color="error"
+                variant="tonal"
+                @click="confirmUserDeletion"
+                prepend-icon="solar:trash-bin-trash-bold-duotone"
+                rounded="lg"
+            >
+                Excluir Conta
+            </v-btn>
+        </div>
 
-        <Modal :show="confirmingUserDeletion" @close="closeModal">
-            <div class="p-6">
-                <h2
-                    class="text-lg font-medium text-gray-900"
-                >
-                    Are you sure you want to delete your account?
-                </h2>
+        <v-dialog v-model="confirmingUserDeletion" max-width="500" persistent>
+            <v-card>
+                <v-card-title class="tw-bg-red-50 tw-text-red-800 tw-py-4">
+                    <Icon icon="solar:danger-triangle-bold-duotone" class="tw-mr-2" width="24" height="24" />
+                    Confirmação de Exclusão
+                </v-card-title>
 
-                <p class="mt-1 text-sm text-gray-600">
-                    Once your account is deleted, all of its resources and data
-                    will be permanently deleted. Please enter your password to
-                    confirm you would like to permanently delete your account.
-                </p>
+                <v-card-text class="tw-py-5">
+                    <p class="tw-text-gray-700 tw-mb-4">
+                        Tem certeza de que deseja excluir sua conta? Esta ação é irreversível e todos os seus dados serão permanentemente excluídos.
+                    </p>
 
-                <div class="mt-6">
-                    <InputLabel
-                        for="password"
-                        value="Password"
-                        class="sr-only"
-                    />
+                    <p class="tw-font-medium tw-text-gray-700 tw-mb-2">Digite sua senha para confirmar:</p>
 
-                    <TextInput
-                        id="password"
-                        ref="passwordInput"
+                    <v-text-field
                         v-model="form.password"
+                        label="Senha"
                         type="password"
-                        class="mt-1 block w-3/4"
-                        placeholder="Password"
+                        :error-messages="form.errors.password"
+                        variant="outlined"
+                        density="comfortable"
+                        autofocus
+                        placeholder="Digite sua senha atual"
+                        prepend-inner-icon="solar:lock-password-bold-duotone"
                         @keyup.enter="deleteUser"
                     />
+                </v-card-text>
 
-                    <InputError :message="form.errors.password" class="mt-2" />
-                </div>
+                <v-card-actions class="tw-px-4 tw-pb-4">
+                    <v-spacer></v-spacer>
+                    
+                    <v-btn
+                        color="gray"
+                        variant="tonal"
+                        @click="closeModal"
+                        class="tw-mr-2"
+                    >
+                        Cancelar
+                    </v-btn>
 
-                <div class="mt-6 flex justify-end">
-                    <SecondaryButton @click="closeModal">
-                        Cancel
-                    </SecondaryButton>
-
-                    <DangerButton
-                        class="ms-3"
-                        :class="{ 'opacity-25': form.processing }"
+                    <v-btn
+                        color="error"
+                        :loading="form.processing"
                         :disabled="form.processing"
                         @click="deleteUser"
                     >
-                        Delete Account
-                    </DangerButton>
-                </div>
-            </div>
-        </Modal>
+                        Confirmar Exclusão
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </section>
 </template>
