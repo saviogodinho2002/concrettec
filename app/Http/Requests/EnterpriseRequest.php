@@ -18,8 +18,13 @@ class EnterpriseRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'type' => ['required', new Enum(EnterpriseTypes::class)],
+            'fantasy_name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255',
+                Rule::unique('enterprises')->ignore($this->enterprise),
 
+                ],
+            'price_cp' => ['required', 'numeric', 'min:0'],
+            'type' => ['required', new Enum(EnterpriseTypes::class)],
             'cnpj' => [
                 'required',
                 'string',
